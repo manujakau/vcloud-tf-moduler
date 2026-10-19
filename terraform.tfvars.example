@@ -1,0 +1,74 @@
+# Example terraform variables for vCloud Director deployment
+
+# Provider credentials
+vcd_url      = "https://your-vcd-url.com/api"
+vcd_username = "administrator"
+vcd_password = "password"
+
+# Organization settings
+org_name        = "my-org"
+org_full_name   = "My Organization"
+org_description = "Organization for Terraform deployment"
+
+# VDC settings
+vdc_name                 = "my-vdc"
+vdc_description          = "Virtual Data Center for Terraform"
+vdc_network_pool_name    = "Default Network Pool"
+vdc_provider_vdc_name    = "Provider VDC Name"
+vdc_allocation_model     = "AllocationPool"  # AllocationVApp, AllocationPool, ReservationPool, Flex
+vdc_cpu_allocated        = 1000
+vdc_memory_allocated     = 4096
+vdc_storage_profile      = [
+  {
+    name    = "Standard"
+    limit   = 10000
+    default = true
+    enabled = true
+  }
+]
+vdc_enable_thin_provisioning = false
+vdc_enable_fast_provisioning = false
+
+# Edge Gateway settings
+edge_gateway_name                 = "my-edge-gateway"
+edge_gateway_description          = "Edge Gateway for Terraform"
+edge_gateway_configuration        = "compact"  # compact, full, full4, x-large
+edge_gateway_external_network     = [
+  {
+    name = "External Network Name"
+    subnets = [
+      {
+        gateway               = "192.168.1.1"
+        netmask               = "255.255.255.0"
+        ip_address            = "192.168.1.100"
+        use_for_default_route = true
+      }
+    ]
+  }
+]
+edge_gateway_ha_enabled             = false
+edge_gateway_fw_default_rule_action = "deny"
+edge_gateway_fw_enabled             = true
+edge_gateway_lb_enabled             = false
+
+# Routed Network settings
+routed_network_name           = "my-network"
+routed_network_description    = "Routed network for Terraform"
+routed_network_interface_type = "internal"
+routed_network_gateway        = "192.168.100.1"
+routed_network_netmask        = "255.255.255.0"
+routed_network_dns1           = "8.8.8.8"
+routed_network_dns2           = "8.8.4.4"
+
+# Firewall rules (example)
+firewall_rules = {
+  # Add your firewall rule definitions here
+}
+
+# NAT rules (examples)
+dnat_rules = {
+  # Add your DNAT rule definitions here
+}
+snat_rules = {
+  # Add your SNAT rule definitions here
+}
