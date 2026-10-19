@@ -28,47 +28,75 @@ vdc_storage_profile      = [
 ]
 vdc_enable_thin_provisioning = false
 vdc_enable_fast_provisioning = false
+vdc_network_quota            = 10 # 0 means NO networks can be created
 
-# Edge Gateway settings
-edge_gateway_name                 = "my-edge-gateway"
-edge_gateway_description          = "Edge Gateway for Terraform"
-edge_gateway_configuration        = "compact"  # compact, full, full4, x-large
-edge_gateway_external_network     = [
+# Edge Gateway settings (NSX-T)
+edge_gateway_name                  = "my-edge-gateway"
+edge_gateway_description           = "Edge Gateway for Terraform"
+edge_gateway_external_network_name = "T0 External Network Name"
+edge_gateway_subnets = [
   {
-    name = "External Network Name"
-    subnets = [
-      {
-        gateway               = "192.168.1.1"
-        netmask               = "255.255.255.0"
-        ip_address            = "192.168.1.100"
-        use_for_default_route = true
-      }
+    gateway       = "192.168.1.1"
+    prefix_length = 24
+    primary_ip    = "192.168.1.100" # must be inside allocated_ips
+    allocated_ips = [
+      { start_address = "192.168.1.100", end_address = "192.168.1.101" }
     ]
   }
 ]
-edge_gateway_ha_enabled             = false
-edge_gateway_fw_default_rule_action = "deny"
-edge_gateway_fw_enabled             = true
-edge_gateway_lb_enabled             = false
 
-# Routed Network settings
+# Routed Network settings (NSX-T)
 routed_network_name           = "my-network"
 routed_network_description    = "Routed network for Terraform"
-routed_network_interface_type = "internal"
+routed_network_interface_type = "INTERNAL" # INTERNAL, DISTRIBUTED, SUBINTERFACE, NON_DISTRIBUTED
 routed_network_gateway        = "192.168.100.1"
-routed_network_netmask        = "255.255.255.0"
+routed_network_prefix_length  = 24
 routed_network_dns1           = "8.8.8.8"
 routed_network_dns2           = "8.8.4.4"
-
-# Firewall rules (example)
-firewall_rules = {
-  # Add your firewall rule definitions here
+routed_network_static_ip_pools = [
+  { start_address = "192.168.100.10", end_address = "192.168.100.99" }
+]
+routed_network_dhcp_pool = {
+  start_address = "192.168.100.100"
+  end_address   = "192.168.100.200"
 }
 
-# NAT rules (examples)
+# Firewall rules - ordered list, evaluated top to bottom.
+# Empty address / port lists mean "any". app_port_profiles are NSX-T built-in
+# profile names; custom_ports creates a tenant profile for the rule.
+firewall_rules = [
+  {
+    name                     = "allow-ssh-in"
+    action                   = "ALLOW" # ALLOW, DROP, REJECT
+    direction                = "IN"    # IN, OUT, IN_OUT
+    destination_ip_addresses = ["192.168.100.0/24"]
+    app_port_profiles        = ["SSH"]
+  },
+  {
+    name                     = "allow-app-in"
+    direction                = "IN"
+    destination_ip_addresses = ["192.168.100.10"]
+    custom_ports             = [{ protocol = "TCP", ports = ["8080", "8443"] }]
+  },
+  {
+    name                = "allow-outbound"
+    direction           = "OUT"
+    source_ip_addresses = ["192.168.100.0/24"]
+  },
+]
+
+# NAT rules
 dnat_rules = {
-  # Add your DNAT rule definitions here
+  web-dnat = {
+    external_address   = "192.168.1.101"
+    internal_address   = "192.168.100.10"
+    app_port_profile   = "HTTP"
+    dnat_external_port = "80"
+  }
 }
 snat_rules = {
-  # Add your SNAT rule definitions here
+  outbound-snat = {
+    internal_address = "192.168.100.0/24"
+    external_address = "192.168.1.100"
+  }
 }
