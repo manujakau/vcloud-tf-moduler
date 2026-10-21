@@ -8,9 +8,51 @@ This repository contains modular Terraform code for provisioning VMware Cloud Di
 - Firewall Rules
 - NAT Rules (DNAT/SNAT)
 
+## Module catalog
+
+This repository is a **versioned module catalog**. Each directory under
+[modules/](modules/) is consumed on its own, pinned to a git tag. See each module's README for its inputs and outputs:
+
+| Module | README |
+|--------|--------|
+| `org` | [modules/org/README.md](modules/org/README.md) |
+| `vdc` | [modules/vdc/README.md](modules/vdc/README.md) |
+| `edge_gateway` | [modules/edge_gateway/README.md](modules/edge_gateway/README.md) |
+| `routed_network` | [modules/routed_network/README.md](modules/routed_network/README.md) |
+| `firewall_rules` | [modules/firewall_rules/README.md](modules/firewall_rules/README.md) |
+| `nat_rules` | [modules/nat_rules/README.md](modules/nat_rules/README.md) |
+
+Terragrunt units reference a module like this:
+
+```hcl
+terraform {
+  source = "git::git@github.com:manujakau/vcloud-tf-modeler.git//modules/vdc?ref=v1.0.0"
+}
+```
+
+The modules contain no `provider` or `backend` blocks. The caller supplies both.
+
+### Testing
+
+Every module has offline tests that run against `mock_provider "vcd"`, so no VCD access is needed:
+
+```bash
+for m in modules/*/; do (cd "$m" && terraform init -backend=false && terraform test); done
+```
+
+### Releasing
+
+1. Update [CHANGELOG.md](CHANGELOG.md) and run the module tests.
+2. Tag the release: `git tag -a vX.Y.Z -m "vX.Y.Z" && git push origin vX.Y.Z`.
+3. Bump `module_version` in the live repo's `env.hcl`, one environment at a time.
+
+> **Deprecated:** the root `main.tf` / `variables.tf` / `outputs.tf` below remain
+> only until the existing state is migrated to per-unit Terragrunt states.
+> Do not add new resources to the root module.
+
 ## Prerequisites
 
-- Terraform 1.3 or higher
+- Terraform 1.3 or higher (1.7+ to run the module tests)
 - VMware Cloud Director provider v3.14.2 or higher
 - System administrator privileges for provisioning resources
 
