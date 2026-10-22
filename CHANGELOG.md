@@ -4,7 +4,22 @@ All notable changes to the module catalog are documented here. Versions follow
 [Semantic Versioning](https://semver.org/); the git tag `vX.Y.Z` is what
 consumers pin with `?ref=vX.Y.Z`.
 
-## [1.0.0] - unreleased
+## [1.1.0] - unreleased
+
+Backward compatible: existing `dnat_rules` / `snat_rules` inputs plan with no changes.
+
+### Added
+- `nat_rules`: `ip_sets` input creates named `vcd_nsxt_ip_set` resources on the edge gateway.
+- `nat_rules`: rules can take an address from an IP set instead of a raw value:
+  `external_ip_set`, `internal_ip_set` (DNAT and SNAT), `snat_destination_ip_set` (SNAT).
+  A referenced set must contain exactly one IP or CIDR (checked by preconditions).
+- `nat_rules`: `ip_set_ids` output.
+
+### Changed
+- `nat_rules`: `external_address` / `internal_address` are now optional, but each
+  address still needs either the raw value or an IP set reference.
+
+## [1.0.0] - 2026-10-21
 
 First versioned release of the catalog. Module code is unchanged from the
 single-root-module layout (commit `b492773`), so existing state maps 1:1 onto
