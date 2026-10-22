@@ -1,4 +1,16 @@
-terraform.tfvars
+# Terraform working files
 .terraform
-terraform.tfstate*
 .terraform.lock.hcl
+crash.log
+crash.*.log
+
+# State: may contain secrets
+terraform.tfstate*
+*.tfstate
+*.tfstate.*
+
+# Variable values and saved plans: may contain secrets
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+*.tfplan
