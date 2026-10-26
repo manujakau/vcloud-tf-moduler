@@ -27,6 +27,9 @@ set's address into the rule.
 - A set used by a NAT rule must contain **exactly one** IP or CIDR. Sets with
   several entries are still created, e.g. for firewall rules via `ip_set_ids`,
   but can't back a NAT address.
+- Leave `snat_destination_*` unset to match every destination. NSX-T rejects
+  a destination that overlaps the rule's internal segment, such as `0.0.0.0/0`
+  ("Address ... overlaps with Segment", error 500105).
 - Renaming a set's key replaces the IP set. Changing its address updates both
   the set and every rule that references it in the same apply.
 - IP set names must be unique on the edge gateway. The `firewall_rules` module
