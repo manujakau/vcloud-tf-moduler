@@ -112,6 +112,7 @@ module "nat_rules" {
   vdc_id          = module.vdc.vdc_id
   edge_gateway_id = module.edge_gateway.gateway_id
 
+  ip_sets    = var.nat_ip_sets
   dnat_rules = var.dnat_rules
   snat_rules = var.snat_rules
 }
