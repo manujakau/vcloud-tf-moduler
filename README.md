@@ -132,10 +132,16 @@ NSX-T backed VDC ("please use 'vcd_nsxt_edgegateway' for NSX-T backed VDC").
   `app_port_profiles` and `custom_ports`. Empty lists mean "any".
 
 ### NAT Rules Configuration
-- `dnat_rules`: Map of DNAT rules: `external_address` → `internal_address`,
-  optional `app_port_profile` (built-in name) and `dnat_external_port`
-- `snat_rules`: Map of SNAT rules: `internal_address` (source) → `external_address`,
-  optional `snat_destination_address`
+- `nat_ip_sets`: Map of named IP sets (`ip_addresses`, optional `name`, `description`)
+  created on the edge gateway. NAT rules can reference one by key instead of a
+  raw address. A referenced set must hold exactly one IP or CIDR.
+- `dnat_rules`: Map of DNAT rules: external (`external_address` or `external_ip_set`) →
+  internal (`internal_address` or `internal_ip_set`), optional `app_port_profile`
+  (built-in name) and `dnat_external_port`
+- `snat_rules`: Map of SNAT rules: internal (`internal_address` or `internal_ip_set`) →
+  external (`external_address` or `external_ip_set`), optional
+  `snat_destination_address` or `snat_destination_ip_set`
+- Per address, set the raw value **or** the IP set key, not both.
 
 ## Example Usage
 
