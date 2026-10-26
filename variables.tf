@@ -249,14 +249,27 @@ variable "firewall_rules" {
 }
 
 # NAT Rules variables
+# Named IP sets on the edge gateway. NAT rules can reference one by key via
+# *_ip_set instead of a raw *_address; such a set must hold exactly one IP/CIDR.
+variable "nat_ip_sets" {
+  type = map(object({
+    name         = optional(string)
+    description  = optional(string)
+    ip_addresses = list(string)
+  }))
+  default = {}
+}
+
 variable "dnat_rules" {
   type = map(object({
     name               = optional(string)
     description        = optional(string)
     enabled            = optional(bool, true)
     logging            = optional(bool, false)
-    external_address   = string
-    internal_address   = string
+    external_address   = optional(string)
+    external_ip_set    = optional(string)
+    internal_address   = optional(string)
+    internal_ip_set    = optional(string)
     dnat_external_port = optional(string)
     app_port_profile   = optional(string)
     firewall_match     = optional(string)
@@ -271,9 +284,12 @@ variable "snat_rules" {
     description              = optional(string)
     enabled                  = optional(bool, true)
     logging                  = optional(bool, false)
-    external_address         = string
-    internal_address         = string
+    external_address         = optional(string)
+    external_ip_set          = optional(string)
+    internal_address         = optional(string)
+    internal_ip_set          = optional(string)
     snat_destination_address = optional(string)
+    snat_destination_ip_set  = optional(string)
     firewall_match           = optional(string)
     priority                 = optional(number)
   }))
