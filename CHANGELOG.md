@@ -4,7 +4,7 @@ All notable changes to the module catalog are documented here. Versions follow
 [Semantic Versioning](https://semver.org/); the git tag `vX.Y.Z` is what
 consumers pin with `?ref=vX.Y.Z`.
 
-## [1.1.0] - unreleased
+## [1.1.0] - 2026-10-26
 
 Backward compatible: existing `dnat_rules` / `snat_rules` inputs plan with no changes.
 
