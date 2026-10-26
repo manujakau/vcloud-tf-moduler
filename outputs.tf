@@ -25,3 +25,7 @@ output "dnat_rule_ids" {
 output "snat_rule_ids" {
   value = module.nat_rules.snat_ids
 }
+
+output "nat_ip_set_ids" {
+  value = module.nat_rules.ip_set_ids
+}
