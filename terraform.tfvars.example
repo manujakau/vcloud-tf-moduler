@@ -85,18 +85,46 @@ firewall_rules = [
   },
 ]
 
-# NAT rules
+# NAT IP sets - named vcd_nsxt_ip_set objects on the edge gateway. A NAT rule
+# can reference one by key (*_ip_set) instead of a raw address (*_address);
+# a referenced set must hold exactly one IP or CIDR. Avoid names the firewall
+# rules create on the same gateway (<rule>-src / <rule>-dst).
+nat_ip_sets = {
+  app-net = {
+    description  = "Routed network"
+    ip_addresses = ["192.168.100.0/24"] # = routed_network_gateway / prefix_length
+  }
+  egw-snat-ip = {
+    description  = "Edge gateway IP used for outbound SNAT"
+    ip_addresses = ["192.168.1.100"] # must be in edge_gateway_subnets allocated_ips
+  }
+  egw-dnat-ip = {
+    description  = "Edge gateway IP used for inbound DNAT"
+    ip_addresses = ["192.168.1.101"] # must be in edge_gateway_subnets allocated_ips
+  }
+  web-vm = {
+    ip_addresses = ["192.168.100.10"]
+  }
+}
+
+# NAT rules - per address set EITHER *_address (raw) OR *_ip_set (key in nat_ip_sets), not both.
 dnat_rules = {
   web-dnat = {
-    external_address   = "192.168.1.101"
-    internal_address   = "192.168.100.10"
+    external_ip_set    = "egw-dnat-ip"
+    internal_ip_set    = "web-vm"
     app_port_profile   = "HTTP"
     dnat_external_port = "80"
   }
 }
 snat_rules = {
   outbound-snat = {
-    internal_address = "192.168.100.0/24"
-    external_address = "192.168.1.100"
+    internal_ip_set = "app-net"
+    external_ip_set = "egw-snat-ip"
   }
+  # Raw addresses still work, and can be mixed with IP sets:
+  # dns-snat = {
+  #   internal_address         = "192.168.100.0/24"
+  #   external_address         = "192.168.1.100"
+  #   snat_destination_address = "8.8.8.8"
+  # }
 }
